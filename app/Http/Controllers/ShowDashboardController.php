@@ -23,7 +23,8 @@ class ShowDashboardController extends Controller
         if (request()->has('search') && request()->search != '') {
             $searchTerm = request()->search;
             $query->where('name', 'like', '%' . $searchTerm . '%')
-                ->orWhere('type', 'like', '%' . $searchTerm . '%');
+                ->orWhere('type', 'like', '%' . $searchTerm . '%')
+                ->orWhere('source', 'like', '%' . $searchTerm . '%');
         }
 
         return $query->orderBy('name')->get();
