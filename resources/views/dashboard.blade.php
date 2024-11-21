@@ -29,7 +29,7 @@
                     <thead>
                     <tr class="border-b border-gray-200">
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ __('Project') }}</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ __('Type') }}</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ __('Tags') }}</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ __('Source') }}</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ __('Branch') }}</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ __('Packages & Updates') }}</th>

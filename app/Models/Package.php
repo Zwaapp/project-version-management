@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Support\Framework\Enums\FrameworkEnum;
+use App\Support\ProjectType\Enums\ProjectTypeEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class Package extends Model
@@ -22,7 +22,7 @@ class Package extends Model
 
     public function getIsFrameworkAttribute(): bool
     {
-        return FrameworkEnum::tryFrom($this->name) ? true : false;
+        return ProjectTypeEnum::tryFrom($this->name) ? true : false;
     }
 
     public function project()

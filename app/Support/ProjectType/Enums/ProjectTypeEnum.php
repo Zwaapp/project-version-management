@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Support\Framework\Enums;
+namespace App\Support\ProjectType\Enums;
 
-enum FrameworkEnum: string
+enum ProjectTypeEnum: string
 {
     case LARAVEL = 'laravel/framework';
     case LUMEN = 'laravel/lumen-framework';
@@ -35,6 +35,7 @@ enum FrameworkEnum: string
     case LARAVEL_NOVA = 'laravel/nova';
     case KATANA = 'katanacms/katana';
     case LARAVEL_LUMEN = 'laravel/lumen';
+    case LIVEWIRE = 'livewire/livewire';
 
 
     public function label(): ?string
@@ -70,6 +71,7 @@ enum FrameworkEnum: string
             self::LARAVEL_NOVA => 'Laravel Nova',
             self::KATANA => 'Katana',
             self::LARAVEL_LUMEN => 'Laravel Lumen',
+            self::LIVEWIRE => 'Livewire',
         };
     }
 

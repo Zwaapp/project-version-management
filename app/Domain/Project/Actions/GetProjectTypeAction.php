@@ -2,7 +2,7 @@
 
 namespace App\Domain\Project\Actions;
 
-use App\Support\Framework\Enums\FrameworkEnum;
+use App\Support\ProjectType\Enums\ProjectTypeEnum;
 
 class GetProjectTypeAction
 {
@@ -14,7 +14,7 @@ class GetProjectTypeAction
 
         // Since multiple frameworks can be active in a project, we need to loop through all packages to find the frameworks
         foreach($packages as $package) {
-            $framework = FrameworkEnum::tryFrom($package);
+            $framework = ProjectTypeEnum::tryFrom($package);
 
             if(!is_null($framework)) {
                 $frameworks[] = $framework->label();
