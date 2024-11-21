@@ -30,7 +30,8 @@ class GetLatestPackageVersionAction
                     usort($stableVersions, function($a, $b) {
                         /*
                          * Delete the 'v' prefix from the version since in some cases it
-                         * is present and in some cases it is not within the same package information
+                         * is present and in some cases it is not within the same package information. This can
+                         * break the version_compare function.
                          */
                         $aVersion = ltrim($a['version'], 'v');
                         $bVersion = ltrim($b['version'], 'v');

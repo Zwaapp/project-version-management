@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('url');
             $table->string('source');
+            $table->string('main_branch');
             $table->string('type')->nullable();
             $table->timestamps();
         });

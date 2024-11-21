@@ -6,9 +6,8 @@ use App\Support\Framework\Enums\FrameworkEnum;
 
 class GetProjectTypeAction
 {
-    public function __invoke(string $composerJson): string
+    public function __invoke(array $composerJson): string
     {
-        $composerJson = json_decode($composerJson, true);
         $packages = array_keys($composerJson['require']) ?? [];
 
         $frameworks = [];

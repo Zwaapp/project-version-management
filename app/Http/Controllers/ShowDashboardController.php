@@ -9,7 +9,7 @@ class ShowDashboardController extends Controller
 
     public function __invoke()
     {
-        $projects = Project::all();
+        $projects = Project::orderBy('name')->get();
 
         return view('dashboard', compact('projects'));
     }

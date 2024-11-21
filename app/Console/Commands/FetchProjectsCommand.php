@@ -27,6 +27,5 @@ class fetchProjectsCommand extends Command
     public function handle()
     {
         app(FetchAndCreateProjectsAction::class)();
-
     }
 }

@@ -10,7 +10,8 @@ class Project extends Model
         'name',
         'url',
         'source',
-        'type'
+        'type',
+        'main_branch'
     ];
 
     public function packages()

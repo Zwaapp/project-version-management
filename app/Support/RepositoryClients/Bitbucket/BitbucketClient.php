@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Support\RepositoryClients\Bitbucket;
+
+use App\Domain\Project\Enum\ProjectSourceEnum;
+use App\Support\RepositoryClients\Exceptions\MissingCredentialsException;
+use App\Support\RepositoryClients\Objects\RepositoryObject;
+use App\Support\RepositoryClients\RepositoryClient;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class BitbucketClient implements RepositoryClient
+{
+    protected string $token;
+    protected array $workspaces;
+    protected string $workspace;
+    protected string $username;
+
+    public function __construct()
+    {
+        $this->token = config('repository-settings.bitbucket.token');
+        $this->workspace = config('repository-settings.bitbucket.workspace');
+        $this->workspaces = explode(',', $this->workspace);
+        $this->username = config('repository-settings.bitbucket.username');
+
+        if (empty($this->token) || empty($this->workspace) || empty($this->username)) {
+            throw new MissingCredentialsException('Missing Bitbucket credentials');
+        }
+    }
+
+    public function getRepositories(): array
+    {
+        $repositories = [];
+
+        foreach($this->workspaces as $workspace) {
+            $url = "https://api.bitbucket.org/2.0/repositories/{$workspace}";
+
+            $response = Http::withBasicAuth($this->username, $this->token)
+                ->get($url);
+
+            if (!$response->successful()) {
+                Log::error("Failed to fetch repositories from Bitbucket: {$response->body()}");
+            }
+
+            $workspaceRepositories = $response->json()['values'];
+
+            if(!count($workspaceRepositories)) {
+                continue;
+            }
+
+            $workspaceRepositories = collect($workspaceRepositories)->map(function ($repository) {
+                return new RepositoryObject(
+                    name: $repository['name'],
+                    url: $repository['links']['html']['href'],
+                    mainBranch: $repository['mainbranch']['name'],
+                    repoSlug: $repository['slug'],
+                    source: ProjectSourceEnum::BITBUCKET
+                );
+            })->toArray();
+
+            $repositories = array_merge($repositories, $workspaceRepositories);
+        }
+
+        return $repositories;
+    }
+
+    public function getComposerLockFile(string $repo, string $branch): array
+    {
+        return $this->getFileFromRepository($repo, 'composer.lock', $branch);
+    }
+
+    public function getComposerJsonFile(string $repo, string $branch): array
+    {
+        return $this->getFileFromRepository($repo, 'composer.json', $branch);
+    }
+
+    protected function getFileFromRepository(string $repo, string $filePath, string $branch = 'master'): array
+    {
+        // TODO: improve workspace logics to avoid multiple requests
+        foreach($this->workspaces as $workspace) {
+            $url = "https://api.bitbucket.org/2.0/repositories/{$workspace}/{$repo}/src/{$branch}/{$filePath}";
+
+            $response = Http::withBasicAuth($this->username, $this->token)
+                ->get($url);
+
+            if (!$response->successful()) {
+                Log::error("Failed to fetch {$filePath} for repository {$repo} and workspace {$workspace}: {$response->body()}");
+                continue;
+            }
+
+            $content = $response->body();
+
+            return json_decode($content, true);
+        }
+
+        return [];
+    }
+}

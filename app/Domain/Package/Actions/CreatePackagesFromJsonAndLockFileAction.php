@@ -8,23 +8,18 @@ use Illuminate\Support\Facades\DB;
 
 class CreatePackagesFromJsonAndLockFileAction
 {
-    public function __invoke(Project $project, string $composerJson, string $composerLock): void
+    public function __invoke(Project $project, array $composerJson, array $composerLock): void
     {
-        // Use db transaction to never lose any data if anything fails
         DB::beginTransaction();
 
         try {
-            // Delete all packages before start
             $project->packages()->delete();
+
             $project->touch();
 
             $directDependencies = $this->getDirectDependencies($composerJson);
 
-            $data = json_decode($composerLock, true);
-
-            // Loop door de packages in de composer.lock
-            foreach ($data['packages'] as $package) {
-                // Controleer of de package voorkomt in de directe afhankelijkheden uit composer.json
+            foreach ($composerLock['packages'] as $package) {
                 $rootPackage = in_array($package['name'], $directDependencies);
 
                 app(CreatePackageAction::class)(
@@ -32,7 +27,7 @@ class CreatePackagesFromJsonAndLockFileAction
                     name: $package['name'],
                     version: $package['version'],
                     type: $package['type'],
-                    fromJsonFile: $rootPackage,  // Markeren als root package als het een directe afhankelijkheid is
+                    fromJsonFile: $rootPackage,
                     latestVersion: app(GetLatestPackageVersionAction::class)($package['name']),
                 );
             }
@@ -45,12 +40,10 @@ class CreatePackagesFromJsonAndLockFileAction
         }
     }
 
-    private function getDirectDependencies($composerJson): array
+    private function getDirectDependencies(array $composerJson): array
     {
-        // Laad de composer.json
-        $composerJsonData = json_decode($composerJson, true);
+        $composerJsonData = $composerJson;
 
-        // Haal de directe afhankelijkheden uit de `require` en `require-dev` secties van composer.json
         $directDependencies = array_merge(
             array_keys($composerJsonData['require'] ?? []),   // Directe productie afhankelijkheden
             array_keys($composerJsonData['require-dev'] ?? []) // Directe development afhankelijkheden
