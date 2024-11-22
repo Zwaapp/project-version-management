@@ -2,6 +2,7 @@
 
 namespace App\Support\RepositoryClients;
 
+use App\Support\RepositoryClients\Contracts\RepositoryClient;
 use App\Support\RepositoryClients\Exceptions\MissingCredentialsException;
 
 class RepositoryClientRegistry

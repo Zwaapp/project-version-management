@@ -3,9 +3,9 @@
 namespace App\Support\RepositoryClients\Bitbucket;
 
 use App\Domain\Project\Enum\ProjectSourceEnum;
+use App\Support\RepositoryClients\Contracts\RepositoryClient;
 use App\Support\RepositoryClients\Exceptions\MissingCredentialsException;
 use App\Support\RepositoryClients\Objects\RepositoryObject;
-use App\Support\RepositoryClients\RepositoryClient;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -53,7 +53,7 @@ class BitbucketClient implements RepositoryClient
                     name: $repository['name'],
                     url: $repository['links']['html']['href'],
                     mainBranch: $repository['mainbranch']['name'],
-                    repoSlug: $repository['slug'],
+                    repoSlug: $repository['full_name'],
                     source: ProjectSourceEnum::BITBUCKET
                 );
             })->toArray();
@@ -76,23 +76,18 @@ class BitbucketClient implements RepositoryClient
 
     protected function getFileFromRepository(string $repo, string $filePath, string $branch = 'master'): array
     {
-        // TODO: improve workspace logics to avoid multiple requests
-        foreach($this->workspaces as $workspace) {
-            $url = "https://api.bitbucket.org/2.0/repositories/{$workspace}/{$repo}/src/{$branch}/{$filePath}";
+        $url = "https://api.bitbucket.org/2.0/repositories/{$repo}/src/{$branch}/{$filePath}";
 
-            $response = Http::withBasicAuth($this->username, $this->token)
-                ->get($url);
+        $response = Http::withBasicAuth($this->username, $this->token)
+            ->get($url);
 
-            if (!$response->successful()) {
-                Log::error("Failed to fetch {$filePath} for repository {$repo} and workspace {$workspace}: {$response->body()}");
-                continue;
-            }
-
-            $content = $response->body();
-
-            return json_decode($content, true);
+        if (!$response->successful()) {
+            Log::error("Failed to fetch {$filePath} for repository {$repo}: {$response->body()}");
+            return [];
         }
 
-        return [];
+        $content = $response->body();
+
+        return json_decode($content, true);
     }
 }

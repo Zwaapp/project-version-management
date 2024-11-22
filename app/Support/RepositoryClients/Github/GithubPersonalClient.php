@@ -3,9 +3,9 @@
 namespace App\Support\RepositoryClients\Github;
 
 use App\Domain\Project\Enum\ProjectSourceEnum;
+use App\Support\RepositoryClients\Contracts\RepositoryClient;
 use App\Support\RepositoryClients\Exceptions\MissingCredentialsException;
 use App\Support\RepositoryClients\Objects\RepositoryObject;
-use App\Support\RepositoryClients\RepositoryClient;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -42,7 +42,7 @@ class GithubPersonalClient implements RepositoryClient
                 name: $repository['name'],
                 url: $repository['html_url'],
                 mainBranch: $repository['default_branch'],
-                repoSlug: $repository['name'],
+                repoSlug: $repository['full_name'],
                 source: ProjectSourceEnum::GITHUB_PERSONAL
             );
         })->toArray();
@@ -61,7 +61,7 @@ class GithubPersonalClient implements RepositoryClient
     private function getFileFromRepository(string $repo, string $filePath, string $branch = 'master'): array
     {
         $response = Http::withToken($this->token)
-            ->get("https://api.github.com/repos/{$this->user}/{$repo}/contents/{$filePath}?ref={$branch}");
+            ->get("https://api.github.com/repos/{$repo}/contents/{$filePath}?ref={$branch}");
 
         if ($response->successful()) {
             $content = $response->json();

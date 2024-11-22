@@ -17,7 +17,7 @@ class CreatePackagesFromJsonAndLockFileAction
 
             $project->touch();
 
-            $directDependencies = $this->getDirectDependencies($composerJson);
+            $directDependencies = app(GetDirectDependenciesAction::class)($composerJson);
 
             foreach ($composerLock['packages'] as $package) {
                 $rootPackage = in_array($package['name'], $directDependencies);
@@ -39,17 +39,4 @@ class CreatePackagesFromJsonAndLockFileAction
             throw $e;
         }
     }
-
-    private function getDirectDependencies(array $composerJson): array
-    {
-        $composerJsonData = $composerJson;
-
-        $directDependencies = array_merge(
-            array_keys($composerJsonData['require'] ?? []),   // Directe productie afhankelijkheden
-            array_keys($composerJsonData['require-dev'] ?? []) // Directe development afhankelijkheden
-        );
-
-        return $directDependencies;
-    }
-
 }

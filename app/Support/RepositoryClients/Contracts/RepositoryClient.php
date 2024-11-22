@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Support\RepositoryClients;
+namespace App\Support\RepositoryClients\Contracts;
 
-use App\Domain\Project\Enum\ProjectSourceEnum;
 use App\Support\RepositoryClients\Objects\RepositoryObject;
 
 interface RepositoryClient

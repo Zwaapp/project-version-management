@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Domain\Project\Actions\FetchAndCreateProjectsAction;
 use Illuminate\Console\Command;
 
-class fetchProjectsCommand extends Command
+class FetchProjectsCommand extends Command
 {
     /**
      * The name and signature of the console command.
