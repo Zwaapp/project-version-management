@@ -68,9 +68,8 @@
                         </button>
 
                         <!-- Update project Icon -->
-                        <x-modal title='Edit Project "{{ $project->name }}"' >
-                            <livewire:project-update-modal-component :project="$project" wire:key="project-{{ $project->id }}" />
-                        </x-modal>
+                        <x-edit-project-component :project="$project" />
+
 
                         <!-- Toggle Packages Icon -->
                         <button x-on:click="openProjects['{{ $project->id }}'] = !openProjects['{{ $project->id }}']"
