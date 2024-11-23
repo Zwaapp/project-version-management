@@ -28,6 +28,7 @@ With this information, you can quickly identify outdated dependencies and take a
 - The tool uses the `composer.lock` file to determine the current version of the dependencies. If the file is not present, the tool skip the entire project and it will not be stored.
 - A cron runs daily to fetch the latest data from the repositories.
 - It is possible to manually trigger fetching new data
+- I personally use ddev to setup my env's for testing, but you can use any other tool you like
 
 ## TODO's
 - Add tests
