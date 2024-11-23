@@ -10,26 +10,31 @@ use Illuminate\Support\Facades\Cache;
 
 class FetchPackagesFromRepositoryAction
 {
-    public function __invoke(Project $project, RepositoryClient $repositoryClient)
+    public function __invoke(Project $project, RepositoryClient $repositoryClient, bool $noCache = false)
     {
-        $cacheKey = "{$project->source->value}_{$project->name}_";
+        $branch = $project->custom_branch ?? $project->main_branch;
+        $cacheKey = "{$project->source->value}_{$project->name}_{$branch}";
 
-        $jsonFile = Cache::remember("{$cacheKey}_json", 1, function() use ($project, $repositoryClient) {
-            return $repositoryClient->getComposerJsonFile($project->repository_slug, $project->main_branch);
+        if($noCache) {
+            Cache::forget("{$cacheKey}_json");
+            Cache::forget("{$cacheKey}_lock");
+        }
+
+        $jsonFile = Cache::remember("{$cacheKey}_json", 60, function() use ($project, $repositoryClient, $branch) {
+            return $repositoryClient->getComposerJsonFile($project->repository_slug, $branch);
         });
 
-        $lockFile = Cache::remember("{$cacheKey}_lock", 1, function() use ($project, $repositoryClient) {
-            return $repositoryClient->getComposerLockFile($project->repository_slug, $project->main_branch);
+        $lockFile = Cache::remember("{$cacheKey}_lock", 60, function() use ($project, $repositoryClient, $branch) {
+            return $repositoryClient->getComposerLockFile($project->repository_slug, $branch);
         });
 
         // If there is no lock file there is no reason to create any data for this project
         if(!$lockFile) {
-            throw new NoLockFileFoundException("No lock file found for {$project->name}");
+            throw new NoLockFileFoundException("No lock file found for {$project->name} and branch {$branch}");
         }
 
         app(CreatePackagesFromJsonAndLockFileAction::class)($project, $jsonFile, $lockFile);
 
         $project->update(['type' => app(GetProjectTypeAction::class)($jsonFile)]);
     }
-
 }

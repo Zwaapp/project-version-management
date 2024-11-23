@@ -5,9 +5,11 @@ use App\Support\RepositoryClients\Github\GithubCompanyClient;
 use App\Support\RepositoryClients\Github\GithubPersonalClient;
 
 return [
-    'default' => [
-        GithubCompanyClient::class,
-        GithubPersonalClient::class,
-        BitbucketClient::class,
-    ]
+    'list' => [
+        'github_company' => GithubCompanyClient::class,
+        'github_personal' => GithubPersonalClient::class,
+        'bitbucket' => BitbucketClient::class,
+    ],
+
+    'repository_clients' => env('REPOSITORY_CLIENTS', '')
 ];

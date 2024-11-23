@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Domain\Project\Enum\ProjectSourceEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
@@ -14,7 +15,8 @@ class Project extends Model
         'type',
         'repository_slug',
         'repository_client',
-        'main_branch'
+        'main_branch',
+        'custom_branch'
     ];
 
 
@@ -24,6 +26,17 @@ class Project extends Model
     public function packages()
     {
         return $this->hasMany(Package::class);
+    }
+
+    public function scopeSearch(Builder $query, string $searchTerm)
+    {
+        if(!$searchTerm) {
+            return $query;
+        }
+
+        return $query->where('name', 'like', '%' . $searchTerm . '%')
+            ->orWhere('type', 'like', '%' . $searchTerm . '%')
+            ->orWhere('source', 'like', '%' . $searchTerm . '%');
     }
 
 }

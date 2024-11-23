@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('url');
             $table->string('source');
             $table->string('main_branch');
+            $table->string('custom_branch')->nullable()->comment('Custom branch to fetch packages from');
             $table->string('repository_slug');
             $table->string('repository_client')->comment('The repository client class name that fetched the project');
             $table->string('type')->nullable()->comment('Komma separated list of the types of the project');

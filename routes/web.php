@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Project\RefreshProjectPackagesController;
+use App\Http\Controllers\Project\UpdateProjectController;
 use App\Http\Controllers\ShowDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,3 +17,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', ShowDashboardController::class)->name('home');
+

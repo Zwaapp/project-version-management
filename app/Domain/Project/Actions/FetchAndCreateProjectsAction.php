@@ -30,8 +30,7 @@ class FetchAndCreateProjectsAction
 
             dispatch(new FetchPackagesJob($project, $repositoryClient));
 
-            // todo: remove projects that are not within the list
+            // todo: remove projects that are not within the list since they are removed
         }
     }
-
 }
