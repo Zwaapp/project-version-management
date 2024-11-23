@@ -35,3 +35,7 @@ With this information, you can quickly identify outdated dependencies and take a
 - Add support for GitLab repositories
 - Use login for making this data more secure
 - Add more documentation
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
