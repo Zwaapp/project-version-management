@@ -15,19 +15,22 @@ With this information, you can quickly identify outdated dependencies and take a
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/dependency-insight-tool.git
-   cd dependency-insight-tool
    composer install
-   GITHUB_TOKEN=your_github_token
-   BITBUCKET_TOKEN=your_bitbucket_token
+   npm install
+   npm run dev
    ```
-2. Run
+2. Setup your .env credentials
+3. php artisan app:fetch_projects
+4. Enjoy the show!
+
+### Good to know:
+- The tool uses the main branch selected at the version system. This can be edited after loading the initial data
+- The tool uses the `composer.lock` file to determine the current version of the dependencies. If the file is not present, the tool skip the entire project and it will not be stored.
+- A cron runs daily to fetch the latest data from the repositories.
+- It is possible to manually trigger fetching new data
 
 ## TODO's
-- Check main/master branch instead of only master
+- Add tests
 - Add support for GitLab repositories
-- Add support for other dependency managers (e.g., npm, pip)
-- Improve error handling and messaging
-- Build in jobs system for fetching all data to prevent timeouts or api rate limits
-- Add more tests
+- Use login for making this data more secure
 - Add more documentation
