@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Support\Packagist\Actions;
+namespace App\Support\VersionsManagers\Implementations;
 
-use App\Support\Versions\Traits\LatestVersionTrait;
+use App\Support\VersionsManagers\Contracts\VersionManagerContract;
+use App\Support\VersionsManagers\Traits\LatestVersionTrait;
 use Illuminate\Support\Facades\Http;
 
-class GetLatestPackagistVersionAction
+class PackagistVersionManager implements VersionManagerContract
 {
     use LatestVersionTrait;
 
-    public function __invoke(string $package): ?string
+    public function getLatestVersion(string $package): ?string
     {
         $url = "https://repo.packagist.org/p2/{$package}.json";
 
@@ -28,5 +29,11 @@ class GetLatestPackagistVersionAction
         })->toArray();
 
         $this->latestVersion($versions);
+    }
+
+    public function supports(string $package): bool
+    {
+        // This is the default manager, so it should always return true
+        return true;
     }
 }

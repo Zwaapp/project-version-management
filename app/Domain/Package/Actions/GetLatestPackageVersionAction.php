@@ -2,15 +2,13 @@
 
 namespace App\Domain\Package\Actions;
 
-use App\Support\ComposerPackage\Actions\GetLatestPackageVersionAction as GetLatestComposerPackageVersionActionAlias;
-use App\Support\Drupal\Actions\GetLatestDrupalPackageVersionAction;
 use App\Support\Drupal\Actions\IsDrupalPackageAction;
-use App\Support\Packagist\Actions\GetLatestPackagistVersionAction;
-use App\Support\Wordpress\Actions\GetLatestWordpressPackageVersionAction;
-use App\Support\Wordpress\Actions\GetLatestPackageVersionAction as GetLatestWordpressPackageVersionActionAlias;
+use App\Support\VersionsManagers\Implementations\DrupalVersionManager;
+use App\Support\VersionsManagers\Implementations\PackagistVersionManager;
+use App\Support\VersionsManagers\Implementations\WordpressVersionManager;
+use App\Support\VersionsManagers\VersionManagerRegistry;
 use App\Support\Wordpress\Actions\IsWordpressPluginAction;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 
 class GetLatestPackageVersionAction
 {
@@ -18,24 +16,18 @@ class GetLatestPackageVersionAction
     {
         try {
             return Cache::remember('latest_package_version_' . $package, 60, function() use ($package) {
-                if(app(IsWordpressPluginAction::class)($package)) {
-                    return app(GetLatestWordpressPackageVersionAction::class)($package);
-                }
+                $versionManagers = app(VersionManagerRegistry::class)();
 
-                if(app(IsDrupalPackageAction::class)($package)) {
-                    return app(GetLatestDrupalPackageVersionAction::class)($package);
-                }
+                foreach($versionManagers as $versionManager) {
+                    if(!$versionManager->supports($package)) {
+                        continue;
+                    }
 
-                return app(GetLatestPackagistVersionAction::class)($package);
+                    return $versionManager->getLatestVersion($package);
+                }
             });
         } catch (\Exception $e) {
             return null;
         }
-    }
-
-    public function getLatestFromPackagist(string $package): ?string
-    {
-
-        return $this->getLatestVersion($versions);
     }
 }

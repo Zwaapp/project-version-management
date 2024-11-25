@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Versions\Traits;
+namespace App\Support\VersionsManagers\Traits;
 
 trait LatestVersionTrait
 {

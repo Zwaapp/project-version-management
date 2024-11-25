@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Support\Drupal\Actions;
+namespace App\Support\VersionsManagers\Implementations;
 
-use App\Support\Versions\Traits\LatestVersionTrait;
+use App\Support\VersionsManagers\Contracts\VersionManagerContract;
+use App\Support\VersionsManagers\Traits\LatestVersionTrait;
 use Illuminate\Support\Facades\Http;
 
-class GetLatestDrupalPackageVersionAction
+class DrupalVersionManager implements VersionManagerContract
 {
     use LatestVersionTrait;
 
-    public function __invoke(string $package): ?string
+    public function getLatestVersion(string $package): ?string
     {
         // Strip everything before the '/' to keep only the module name
         $moduleName = explode('/', $package)[1];
@@ -38,4 +39,8 @@ class GetLatestDrupalPackageVersionAction
         return $this->latestVersion($releases);
     }
 
+    public function supports(string $package): bool
+    {
+        return !strpos($package, 'drupal/');
+    }
 }

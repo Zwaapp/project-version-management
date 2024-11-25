@@ -1,8 +1,8 @@
 <?php
 
-use App\Support\RepositoryClients\Bitbucket\BitbucketClient;
-use App\Support\RepositoryClients\Github\GithubCompanyClient;
-use App\Support\RepositoryClients\Github\GithubPersonalClient;
+use App\Support\RepositoryClients\Implementations\BitbucketClient;
+use App\Support\RepositoryClients\Implementations\GithubCompanyClient;
+use App\Support\RepositoryClients\Implementations\GithubPersonalClient;
 
 return [
     'list' => [

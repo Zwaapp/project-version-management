@@ -28,6 +28,7 @@ class FetchPackagesJob implements ShouldQueue
             app(FetchPackagesFromRepositoryAction::class)($this->project, $this->repositoryClient);
         } catch (NoLockFileFoundException $e) {
             // Delete projects that dont have any composer references since we cannot use them
+            $this->project->packages()->delete();
             $this->project->delete();
         }
     }

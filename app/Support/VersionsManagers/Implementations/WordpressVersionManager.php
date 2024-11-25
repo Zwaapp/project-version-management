@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Support\Wordpress\Actions;
+namespace App\Support\VersionsManagers\Implementations;
 
-use App\Support\Versions\Traits\LatestVersionTrait;
+use App\Support\VersionsManagers\Contracts\VersionManagerContract;
+use App\Support\VersionsManagers\Traits\LatestVersionTrait;
 use Illuminate\Support\Facades\Http;
 
-class GetLatestWordpressPackageVersionAction
+class WordpressVersionManager implements VersionManagerContract
 {
     use LatestVersionTrait;
 
-    public function __invoke(string $package): ?string
+    public function getLatestVersion(string $package): ?string
     {
         // Stripe verything before the '/' to keep only the package name
         $slug = explode('/', $package)[1];
@@ -29,4 +30,19 @@ class GetLatestWordpressPackageVersionAction
         return $this->latestVersion($versions);
     }
 
+    public function supports(string $package): bool
+    {
+        $packageNames = [
+            'wpackagist-plugin',
+            'wordpress-plugin',
+        ];
+
+        foreach($packageNames as $packageName) {
+            if(strpos($package, $packageName) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

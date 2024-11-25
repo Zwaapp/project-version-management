@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\RepositoryClients\Github;
+namespace App\Support\RepositoryClients\Implementations;
 
 use App\Domain\Project\Enum\ProjectSourceEnum;
 use App\Support\RepositoryClients\Contracts\RepositoryClient;
