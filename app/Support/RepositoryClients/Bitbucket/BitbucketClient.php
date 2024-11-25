@@ -32,37 +32,45 @@ class BitbucketClient implements RepositoryClient
     {
         $repositories = [];
 
-        foreach($this->workspaces as $workspace) {
-            $url = "https://api.bitbucket.org/2.0/repositories/{$workspace}";
+        foreach ($this->workspaces as $workspace) {
+            $url = "https://api.bitbucket.org/2.0/repositories/{$workspace}?pagelen=25";
 
-            $response = Http::withBasicAuth($this->username, $this->token)
-                ->get($url);
+            do {
+                $response = Http::withBasicAuth($this->username, $this->token)
+                    ->get($url);
 
-            if (!$response->successful()) {
-                Log::error("Failed to fetch repositories from Bitbucket: {$response->body()}");
-            }
+                if (!$response->successful()) {
+                    Log::error("Failed to fetch repositories from Bitbucket: {$response->body()}");
+                    break;
+                }
 
-            $workspaceRepositories = $response->json()['values'];
+                $workspaceRepositories = $response->json()['values'] ?? [];
 
-            if(!count($workspaceRepositories)) {
-                continue;
-            }
+                if (empty($workspaceRepositories)) {
+                    break;
+                }
 
-            $workspaceRepositories = collect($workspaceRepositories)->map(function ($repository) {
-                return new RepositoryObject(
-                    name: $repository['name'],
-                    url: $repository['links']['html']['href'],
-                    mainBranch: $repository['mainbranch']['name'],
-                    repoSlug: $repository['full_name'],
-                    source: ProjectSourceEnum::BITBUCKET
-                );
-            })->toArray();
+                $mappedRepositories = collect($workspaceRepositories)->map(function ($repository) {
+                    return new RepositoryObject(
+                        name: $repository['name'],
+                        url: $repository['links']['html']['href'],
+                        mainBranch: $repository['mainbranch']['name'] ?? null,
+                        repoSlug: $repository['full_name'],
+                        source: ProjectSourceEnum::BITBUCKET
+                    );
+                })->toArray();
 
-            $repositories = array_merge($repositories, $workspaceRepositories);
+                $repositories = array_merge($repositories, $mappedRepositories);
+
+                // Ga naar de volgende pagina als er een 'next'-link is
+                $url = $response->json()['next'] ?? null;
+
+            } while ($url);
         }
 
         return $repositories;
     }
+
 
     public function getComposerLockFile(string $repo, string $branch): array
     {

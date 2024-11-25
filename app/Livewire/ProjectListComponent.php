@@ -20,6 +20,7 @@ class ProjectListComponent extends Component
 
     public function mount()
     {
+        $this->search = request()->get('search', '');
         $this->fetchProjects();
     }
 
@@ -30,7 +31,7 @@ class ProjectListComponent extends Component
 
     public function fetchProjects()
     {
-        $this->projects = Project::search($this->search)->orderBy('name')->get();
+        $this->projects = Project::where('active', true)->search($this->search)->orderBy('name')->get();
     }
 
     #[On('searchUpdated')]
@@ -56,6 +57,18 @@ class ProjectListComponent extends Component
         if(!$this->success) {
             $this->success = "The packages have been updated successfully.";
         }
+    }
+
+    public function removeProject(int $projectId)
+    {
+        $project = Project::find($projectId);
+
+        $project->update(['active' => false]);
+
+        $this->fetchProjects();
+
+        $this->success = "The project {$project->name} has been removed.";
+
     }
 
     #[On('updatedCustomBranch')]

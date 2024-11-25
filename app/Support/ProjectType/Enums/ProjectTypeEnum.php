@@ -4,6 +4,7 @@ namespace App\Support\ProjectType\Enums;
 
 enum ProjectTypeEnum: string
 {
+    case THEMOSIS = 'themosis/framework';
     case LARAVEL = 'laravel/framework';
     case LUMEN = 'laravel/lumen-framework';
     case FILAMENT = 'laravel-filament/filament';
@@ -36,7 +37,6 @@ enum ProjectTypeEnum: string
     case KATANA = 'katanacms/katana';
     case LARAVEL_LUMEN = 'laravel/lumen';
     case LIVEWIRE = 'livewire/livewire';
-
 
     public function label(): ?string
     {
@@ -72,6 +72,7 @@ enum ProjectTypeEnum: string
             self::KATANA => 'Katana',
             self::LARAVEL_LUMEN => 'Laravel Lumen',
             self::LIVEWIRE => 'Livewire',
+            self::THEMOSIS => 'Themosis',
         };
     }
 

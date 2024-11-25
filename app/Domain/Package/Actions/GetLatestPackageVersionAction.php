@@ -14,47 +14,74 @@ class GetLatestPackageVersionAction
     {
         try {
             return Cache::remember('latest_package_version_' . $package, 60, function() use ($package) {
-                $url = $this->getRemoteUrl($package);
-                $response = Http::get($url);
-
-                if ($response->successful()) {
-                    $data = $response->json();
-                    $versions = $data['packages'][$package];
-
-                    $stableVersions = array_filter($versions, function($package) {
-                        // Strip alpha, beta and rc versions
-                        return !preg_match('/-(alpha|beta|rc)/i', $package['version']);
-                    });
-
-                    // Find the latest stable version
-                    usort($stableVersions, function($a, $b) {
-                        /*
-                         * Delete the 'v' prefix from the version since in some cases it
-                         * is present and in some cases it is not within the same package information. This can
-                         * break the version_compare function.
-                         */
-                        $aVersion = ltrim($a['version'], 'v');
-                        $bVersion = ltrim($b['version'], 'v');
-
-                        return version_compare($bVersion, $aVersion);
-                    });
-
-                    return $stableVersions[0]['version'] ?? null;
+                if(app(IsWordpressPluginAction::class)($package)) {
+                    return $this->getLatestFromWordpress($package);
                 }
 
-                return null;
+                return $this->getLatestFromPackagist($package);
             });
         } catch (\Exception $e) {
             return null;
         }
     }
 
-    private function getRemoteUrl(string $package): string
+    public function getLatestFromPackagist(string $package): ?string
     {
-        if(app(IsWordpressPluginAction::class)($package)) {
-            return "https://wpackagist.org/p2/{$package}.json";
+        $url = "https://repo.packagist.org/p2/{$package}.json";
+
+        $response = Http::get($url);
+
+        if (!$response->successful()) {
+            return null;
         }
 
-        return "https://repo.packagist.org/p2/{$package}.json";
+        $data = $response->json();
+        $versions = $data['packages'][$package];
+
+        return $this->getLatestVersion($versions);
+    }
+
+    public function getLatestVersion(array $versions)
+    {
+        $stableVersions = collect($versions)
+            ->map(function($version, $key) { // Make one format
+                // In case of wordpress plugins the value is the link to the plugin and the key is the actual version
+                return is_string($version) ? $key : $version['version'];
+            })->filter(function($version) { // Remove non-stable versions
+                return !preg_match('/-(alpha|beta|rc)/i', $version);
+            })->toArray();
+
+        // Find the latest stable version
+        usort($stableVersions, function($a, $b) {
+            /*
+             * Delete the 'v' prefix from the version since in some cases it
+             * is present and in some cases it is not within the same package information. This can
+             * break the version_compare function.
+             */
+            $aVersion = ltrim($a, 'v');
+            $bVersion = ltrim($b, 'v');
+
+            return version_compare($bVersion, $aVersion);
+        });
+
+        return $stableVersions[0] ?? null;
+
+    }
+
+    public function getLatestFromWordpress(string $package): ?string
+    {
+        // Stripe verything before the '/' to keep only the package name
+        $slug = explode('/', $package)[1];
+        $url = "https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]={$slug}";
+
+        $response = Http::get($url);
+
+        if (!$response->successful()) {
+            return null;
+        }
+
+        $data = $response->json();
+
+        return $this->getLatestVersion($data['versions']);
     }
 }

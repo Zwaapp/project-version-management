@@ -13,6 +13,7 @@ class Project extends Model
         'url',
         'source',
         'type',
+        'active',
         'repository_slug',
         'repository_client',
         'main_branch',
@@ -36,7 +37,12 @@ class Project extends Model
 
         return $query->where('name', 'like', '%' . $searchTerm . '%')
             ->orWhere('type', 'like', '%' . $searchTerm . '%')
-            ->orWhere('source', 'like', '%' . $searchTerm . '%');
+            ->orWhere('source', 'like', '%' . $searchTerm . '%')
+            // Also search packages
+            ->orWhereHas('packages', function (Builder $packageQuery) use ($searchTerm) {
+                $packageQuery->where('name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('version', 'like', '%' . $searchTerm . '%');
+            });
     }
 
 }

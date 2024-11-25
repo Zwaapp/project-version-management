@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Package\Actions\HasLatestVersion;
 use App\Support\ProjectType\Enums\ProjectTypeEnum;
 use Illuminate\Database\Eloquent\Model;
 
@@ -30,4 +31,17 @@ class Package extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function hasLatestVersion(): bool
+    {
+        return app(HasLatestVersion::class)($this);
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        // Also search where project active is true
+        return $query->where('name', 'like', '%' . $search . '%')->orWhere('version', 'like', '%' . $search . '%')
+            ->whereHas('project', function ($query) use ($search) {
+                $query->where('active', true);
+            });
+    }
 }

@@ -6,7 +6,18 @@ class IsWordpressPluginAction
 {
     public function __invoke(string $package): bool
     {
-        return strpos($package, 'wordpress-plugin') !== false;
+        $packageNames = [
+            'wpackagist-plugin',
+            'wordpress-plugin',
+        ];
+
+        foreach($packageNames as $packageName) {
+            if(strpos($package, $packageName) === 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

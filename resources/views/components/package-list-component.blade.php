@@ -20,7 +20,9 @@
                 <td class="px-4 py-3 text-sm text-gray-600">{{ $package->version }}</td>
                 <td class="px-4 py-3 text-sm text-gray-600">{{ $package->latest_version ?? __('Unknown') }}</td>
                 <td class="px-4 py-3 text-sm">
-                    @if ($package->latest_version && $package->latest_version !== $package->version)
+                    @if (!$package->latest_version)
+                        <span class="text-yellow-600 font-semibold">{{ __('Unknown') }}</span>
+                    @elseif (!$package->hasLatestVersion())
                         <span class="text-red-600 font-semibold">{{ __('Update available') }}</span>
                     @else
                         <span class="text-green-600 font-semibold">{{ __('Up to date') }}</span>

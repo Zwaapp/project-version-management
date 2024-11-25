@@ -1,4 +1,4 @@
-<div x-data="{ open: false }">
+<div x-data="{ open: false }" x-cloak>
     <!-- Button to Open Modal -->
     <button @click="open = true"
             title="{{ $title ?? 'Open Modal' }}"

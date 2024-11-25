@@ -8,7 +8,7 @@ class GetProjectTypeAction
 {
     public function __invoke(array $composerJson): string
     {
-        $packages = array_keys($composerJson['require']) ?? [];
+        $packages = array_keys($composerJson['require'] ?? []) ?? [];
 
         $frameworks = [];
 
