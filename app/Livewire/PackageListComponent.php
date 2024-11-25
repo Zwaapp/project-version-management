@@ -41,6 +41,4 @@ class PackageListComponent extends Component
 
         $this->packages = Package::search($this->search)->orderBy('name')->get();
     }
-
-
 }

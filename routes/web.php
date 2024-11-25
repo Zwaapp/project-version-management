@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Project\RefreshProjectPackagesController;
-use App\Http\Controllers\Project\UpdateProjectController;
 use App\Http\Controllers\ShowDashboardController;
 use App\Http\Controllers\ShowPackageSearcherController;
 use Illuminate\Support\Facades\Route;

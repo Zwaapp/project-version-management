@@ -1,4 +1,32 @@
-<div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+<div class="bg-white border border-gray-200 rounded-lg shadow-sm"><!-- Loading Overlay -->
+
+    <div wire:loading class="fixed inset-0 bg-gray-800 flex items-center justify-center z-50 h-12">
+        <div class="text-center text-white">
+            <div class="flex space-x-2 items-center justify-center h-full">
+                <span class="text-2xl font-semibold">{{ __('Refreshing projects...') }}</span>
+                <i class="fas fa-sync-alt animate-spin text-2xl"></i>
+            </div>
+        </div>
+    </div>
+    <!-- Check of er een foutmelding is en toon deze -->
+    @if ($error)
+        <div class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center bg-red-600 text-white p-4">
+            <p class="font-medium">{{ $error }}</p>
+            <button wire:click="closeError" class="ml-4 text-white font-semibold hover:text-gray-200">
+                <i class="fas fa-times"></i> {{ __('Close') }}
+            </button>
+        </div>
+    @endif
+    @if ($success)
+        <div class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center bg-green-600 text-white p-4">
+            <p class="font-medium">{{ $success }}</p>
+            <button wire:click="closeSuccess" class="ml-4 text-white font-semibold hover:text-gray-200">
+                <i class="fas fa-times"></i> {{ __('Close') }}
+            </button>
+        </div>
+    @endif
+
+
     <h1 class="p-8 text-2xl">{{ count($projects) }} {{ __('projects found') }}</h1>
     <!-- Header -->
     <div class="grid grid-cols-7 border-b border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-600">
