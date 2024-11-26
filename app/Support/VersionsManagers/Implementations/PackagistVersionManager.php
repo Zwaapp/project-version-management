@@ -28,7 +28,7 @@ class PackagistVersionManager implements VersionManagerContract
             return $version['version'];
         })->toArray();
 
-        $this->latestVersion($versions);
+        return $this->latestVersion($versions);
     }
 
     public function supports(string $package): bool

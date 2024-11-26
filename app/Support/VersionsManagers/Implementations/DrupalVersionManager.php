@@ -41,6 +41,6 @@ class DrupalVersionManager implements VersionManagerContract
 
     public function supports(string $package): bool
     {
-        return !strpos($package, 'drupal/');
+        return strpos($package, 'drupal/');
     }
 }
